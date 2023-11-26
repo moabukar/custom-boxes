@@ -1,0 +1,43 @@
+{
+  "builders": [
+    {
+      "type":         "docker",
+      "image":        "debian",
+      "export_path":  "docker-lamp.tar"
+    }
+  ],
+
+  "provisioners": [
+    {
+      "type":             "shell",
+      "execute_command":  "echo 'root' | sh '{{ .Path }}'",
+      "scripts": [
+        "scripts/lamp/sudoers.sh",
+        "scripts/lamp/sshd.sh",
+        "scripts/lamp/vagrant.sh",
+        "scripts/lamp/apache2.sh",
+        "scripts/lamp/php5.sh",
+        "scripts/lamp/mysql.sh",
+        "scripts/lamp/create-folder.sh"
+      ]
+    },
+    {
+      "type":         "file",
+      "source":       "files/lamp-vagrant/vhost",
+      "destination":  "/etc/apache2/sites-available/lamp-php"
+    },
+    {
+      "type":             "shell",
+      "execute_command":  "echo 'root' | sh '{{ .Path }}'",
+      "script":           "scripts/lamp/enable-vhost"
+    }
+  ],
+
+  "post-processors": [
+    {
+      "type":       "docker-import",
+      "repository": "salizzar/docker-lamp",
+      "tag":        "0.1"
+    }
+  ]
+}
